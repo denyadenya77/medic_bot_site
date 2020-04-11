@@ -1,0 +1,8 @@
+.env
+.idea/*
+medic_bot_site/__pycache__/*
+routes/__pycache__/*
+routes/migrations/__pycache__/*
+users/__pycache__/*
+users/migrations/__pycache__/*
+
