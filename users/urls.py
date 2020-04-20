@@ -1,8 +1,13 @@
-from django.urls import path
-from .views import ServiceUserCreationView, ServiceUserDeleteView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from users import views
 
+router = DefaultRouter()
+router.register(r'users', views.ServiceUserViewSet)
 
 urlpatterns = [
-    path('create/', ServiceUserCreationView.as_view(), name='service-user-creation'),
-    path('delete/<int:pk>', ServiceUserDeleteView.as_view(), name='service-user-deletion'),
+    path('', include(router.urls)),
+    path('delete-user/<int:telegram_id>/', views.service_user_delete, name='delete_user')
 ]
+
+

@@ -1,19 +1,24 @@
-from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, DeleteView
+from rest_framework import viewsets, status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from .serializers import ServiceUserSerializer
 from .models import ServiceUser
 
 
-class ServiceUserCreationView(CreateView):
-    model = ServiceUser
-    template_name = 'service_user_creation.html'
-    fields = ['telegram_id', 'type', 'first_name', 'last_name', 'phone_number']
+@api_view(['DELETE'])
+def service_user_delete(request, telegram_id):
+    try:
+        user = ServiceUser.objects.get(telegram_id=telegram_id)
+    except ServiceUser.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def get_success_url(self):
-        return reverse('service-user-creation')
+    if request.method == 'DELETE':
+        user.delete()
+        return Response(status.HTTP_204_NO_CONTENT)
 
 
-class ServiceUserDeleteView(DeleteView):
-    model = ServiceUser
-    template_name = 'service_user_deletion.html'
-    success_url = reverse_lazy('service-user-creation')
+class ServiceUserViewSet(viewsets.ModelViewSet):
+    queryset = ServiceUser.objects.all()
+    serializer_class = ServiceUserSerializer
 

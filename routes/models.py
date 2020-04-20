@@ -1,11 +1,10 @@
 from django.contrib.gis.db import models
 from users.models import ServiceUser
-# Create your models here.
 
 
 class Route(models.Model):
     user = models.ForeignKey(ServiceUser, on_delete=models.CASCADE)
-    date_and_time = models.DateTimeField(default=None)
+    date_and_time = models.DateTimeField(null=True)
     start_point = models.PointField()
     finish_point = models.PointField()
 

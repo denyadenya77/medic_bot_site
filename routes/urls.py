@@ -1,9 +1,11 @@
-from django.urls import path
-from .views import OneTimeRouteCreateView, RegularRouteCreateView, GetRoutesListView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import RouteViewSet, GetRoutes
 
+router = DefaultRouter()
+router.register(r'routes', RouteViewSet)
 
 urlpatterns = [
-    path('create_one/', OneTimeRouteCreateView.as_view(), name='one-time-route-creation'),
-    path('create_regular/', RegularRouteCreateView.as_view(), name='regular-route-creation'),
-    path('filtered_list/', GetRoutesListView.as_view(), name='filtered-routes'),
+    path('', include(router.urls)),
+    path('get_similar/', GetRoutes.as_view(), name='get_similar_routes')
 ]

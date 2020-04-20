@@ -1,28 +1,70 @@
-from django.urls import reverse
-from django.views.generic import CreateView, ListView
+from django.contrib.gis.geos import Point
+from django.contrib.gis.measure import Distance
+from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .serializers import RouteSerializer, GetSimilarRoutesSerializer
 from .models import Route
+from users.models import ServiceUser
+import datetime
 
 
-class OneTimeRouteCreateView(CreateView):
-    model = Route
-    template_name = 'one_time_route_creation.html'
-    fields = ['user', 'date_and_time', 'start_point', 'finish_point']
+class RouteViewSet(viewsets.ModelViewSet):
 
-    def get_success_url(self):
-        return reverse('one-time-route-creation')
+    queryset = Route.objects.all()
+    serializer_class = RouteSerializer
 
-
-class RegularRouteCreateView(CreateView):
-    model = Route
-    template_name = 'regular_route_creation.html'
-    fields = ['user', 'start_point', 'finish_point']
-
-    def get_success_url(self):
-        return reverse('regular-route-creation')
+    def perform_create(self, serializer):
+        telegram_id = serializer.validated_data['user']
+        user = ServiceUser.objects.get(telegram_id=telegram_id)
+        serializer.save(user=user)
 
 
-class GetRoutesListView(ListView):
-    model = Route
-    context_object_name = 'routes'
-    template_name = 'filtered_routes.html'
+class GetRoutes(APIView):
 
+    def get_time(self, date_and_time):
+        arrival_time = datetime.datetime.strptime(date_and_time, '%Y-%m-%dT%H:%M:%SZ')
+        min_time = arrival_time - datetime.timedelta(minutes=30)
+        max_time = arrival_time + datetime.timedelta(minutes=30)
+        return min_time, max_time
+
+    def get_medic_routes(self, **kwargs):
+        if kwargs['min_time']:
+            routes = Route.objects.filter(user__type='medic',
+                                          date_and_time__range=(kwargs['min_time'], kwargs['max_time']),
+                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
+        else:
+            routes = Route.objects.filter(user__type='medic',
+                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
+        return routes
+
+    def get_driver_routes(self, **kwargs):
+        if kwargs['min_time']:
+            routes = Route.objects.filter(user__type='driver',
+                                          date_and_time__range=(kwargs['min_time'], kwargs['max_time']),
+                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
+        else:
+            routes = Route.objects.filter(user__type='driver',
+                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
+        return routes
+
+    def get(self, request):
+        request_user = ServiceUser.objects.get(telegram_id=request.data['telegram_id'])
+        start_point = Point(request.data['start_point']['longitude'], request.data['start_point']['latitude'])
+        if request.data['date_and_time']:
+            min_time, max_time = self.get_time(request.data['date_and_time'])
+        else:
+            min_time, max_time = None, None
+
+        if request_user.type == 'driver':
+            routes = self.get_medic_routes(start_point=start_point,
+                                           min_time=min_time,
+                                           max_time=max_time)
+        else:
+            routes = self.get_driver_routes(start_point=start_point,
+                                            min_time=min_time,
+                                            max_time=max_time)
+
+        serializer = GetSimilarRoutesSerializer(routes, many=True)
+        return Response(serializer.data)
