@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 from dotenv import load_dotenv
+import dj_database_url
 load_dotenv()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -25,9 +26,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['medic-bot-site.herokuapp.com']
 
 
 # Application definition
@@ -89,6 +90,8 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
