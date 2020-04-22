@@ -1,1 +1,1 @@
-web: gunicorn herokugisproject.wsgi --log-file=-
+web: gunicorn medic_bot_site.wsgi --log-file=-
