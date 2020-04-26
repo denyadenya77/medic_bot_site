@@ -8,6 +8,7 @@ from .serializers import RouteSerializer, GetSimilarRoutesSerializer
 from .models import Route
 from users.models import ServiceUser
 import datetime
+from django.db.models import Q
 
 
 class RouteViewSet(viewsets.ModelViewSet):
@@ -31,8 +32,9 @@ class GetRoutes(APIView):
 
     def get_medic_routes(self, **kwargs):
         if kwargs.get('min_time'):
-            routes = Route.objects.filter(user__type='doctor',
-                                          date_and_time__range=(kwargs['min_time'], kwargs['max_time']),
+            routes = Route.objects.filter(Q(date_and_time__range=(kwargs['min_time'], kwargs['max_time'])) |
+                                          Q(date_and_time=None),
+                                          user__type='doctor',
                                           start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
         else:
             routes = Route.objects.filter(user__type='doctor',
@@ -41,8 +43,9 @@ class GetRoutes(APIView):
 
     def get_driver_routes(self, **kwargs):
         if kwargs.get('min_time'):
-            routes = Route.objects.filter(user__type='driver',
-                                          date_and_time__range=(kwargs['min_time'], kwargs['max_time']),
+            routes = Route.objects.filter(Q(date_and_time__range=(kwargs['min_time'], kwargs['max_time'])) |
+                                          Q(date_and_time=None),
+                                          user__type='driver',
                                           start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
         else:
             routes = Route.objects.filter(user__type='driver',
