@@ -52,7 +52,7 @@ class GetRoutes(APIView):
     def get(self, request):
         request_user = ServiceUser.objects.get(telegram_id=request.data['telegram_id'])
         start_point = Point(request.data['start_point']['longitude'], request.data['start_point']['latitude'])
-        if request['date_and_time']:
+        if request.date_and_time:
             min_time, max_time = self.get_time(request.data['date_and_time'])
         else:
             min_time, max_time = None, None
