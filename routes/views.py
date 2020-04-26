@@ -30,7 +30,7 @@ class GetRoutes(APIView):
         return min_time, max_time
 
     def get_medic_routes(self, **kwargs):
-        if kwargs['min_time']:
+        if kwargs.get('min_time'):
             routes = Route.objects.filter(user__type='medic',
                                           date_and_time__range=(kwargs['min_time'], kwargs['max_time']),
                                           start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
@@ -40,7 +40,7 @@ class GetRoutes(APIView):
         return routes
 
     def get_driver_routes(self, **kwargs):
-        if kwargs['min_time']:
+        if kwargs.get('min_time'):
             routes = Route.objects.filter(user__type='driver',
                                           date_and_time__range=(kwargs['min_time'], kwargs['max_time']),
                                           start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
@@ -52,7 +52,7 @@ class GetRoutes(APIView):
     def get(self, request):
         request_user = ServiceUser.objects.get(telegram_id=request.data['telegram_id'])
         start_point = Point(request.data['start_point']['longitude'], request.data['start_point']['latitude'])
-        if request.data['date_and_time']:
+        if request.get('date_and_time'):
             min_time, max_time = self.get_time(request.data['date_and_time'])
         else:
             min_time, max_time = None, None
