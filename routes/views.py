@@ -24,7 +24,7 @@ class RouteViewSet(viewsets.ModelViewSet):
 class GetRoutes(APIView):
 
     def get_time(self, date_and_time):
-        arrival_time = datetime.datetime.strptime(date_and_time, '%Y-%m-%dT%H:%M:%SZ')
+        arrival_time = datetime.datetime.strptime(date_and_time, '%H.%M %d.%m.%Y')
         min_time = arrival_time - datetime.timedelta(minutes=30)
         max_time = arrival_time + datetime.timedelta(minutes=30)
         return min_time, max_time
