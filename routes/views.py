@@ -31,11 +31,11 @@ class GetRoutes(APIView):
 
     def get_medic_routes(self, **kwargs):
         if kwargs.get('min_time'):
-            routes = Route.objects.filter(user__type='medic',
+            routes = Route.objects.filter(user__type='doctor',
                                           date_and_time__range=(kwargs['min_time'], kwargs['max_time']),
                                           start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
         else:
-            routes = Route.objects.filter(user__type='medic',
+            routes = Route.objects.filter(user__type='doctor',
                                           start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
         return routes
 
