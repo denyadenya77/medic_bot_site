@@ -4,6 +4,8 @@ from rest_framework.response import Response
 
 from .serializers import ServiceUserSerializer
 from .models import ServiceUser
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 
 @api_view(['DELETE'])
@@ -21,4 +23,11 @@ def service_user_delete(request, telegram_id):
 class ServiceUserViewSet(viewsets.ModelViewSet):
     queryset = ServiceUser.objects.all()
     serializer_class = ServiceUserSerializer
+
+    def get_object(self):
+        if self.request.data.get('telegram_id'):
+            service_user = get_object_or_404(ServiceUser, telegram_id=self.request.data['telegram_id'])
+            return service_user
+        else:
+            return super().get_object()
 
