@@ -6,6 +6,7 @@ from .serializers import ServiceUserSerializer
 from .models import ServiceUser
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from rest_framework.decorators import action
 
 
 @api_view(['DELETE'])
@@ -24,10 +25,7 @@ class ServiceUserViewSet(viewsets.ModelViewSet):
     queryset = ServiceUser.objects.all()
     serializer_class = ServiceUserSerializer
 
-    def get_object(self):
-        if self.request.data.get('telegram_id'):
-            service_user = get_object_or_404(ServiceUser, telegram_id=self.request.data['telegram_id'])
-            return service_user
-        else:
-            return super().get_object()
-
+    def retrieve(self, request, *args, **kwargs):
+        instance = ServiceUser.objects.get(telegram_id=request.data.get('telegram_id'))
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
