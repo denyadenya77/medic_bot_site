@@ -35,10 +35,10 @@ class GetRoutes(APIView):
             routes = Route.objects.filter(Q(date_and_time__range=(kwargs['min_time'], kwargs['max_time'])) |
                                           Q(date_and_time=None),
                                           user__type='doctor',
-                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
+                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=3)))
         else:
             routes = Route.objects.filter(user__type='doctor',
-                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
+                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=3)))
         return routes
 
     def get_driver_routes(self, **kwargs):
@@ -46,10 +46,10 @@ class GetRoutes(APIView):
             routes = Route.objects.filter(Q(date_and_time__range=(kwargs['min_time'], kwargs['max_time'])) |
                                           Q(date_and_time=None),
                                           user__type='driver',
-                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
+                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=3)))
         else:
             routes = Route.objects.filter(user__type='driver',
-                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=10)))
+                                          start_point__distance_lt=(kwargs['start_point'], Distance(km=3)))
         return routes
 
     def get(self, request):

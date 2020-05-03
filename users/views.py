@@ -4,9 +4,6 @@ from rest_framework.response import Response
 
 from .serializers import ServiceUserSerializer
 from .models import ServiceUser
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
-from rest_framework.decorators import action
 
 
 @api_view(['DELETE'])
