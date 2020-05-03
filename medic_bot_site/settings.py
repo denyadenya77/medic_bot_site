@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['medic-bot-site.herokuapp.com']
+ALLOWED_HOSTS = ['https://medic-bot-site.herokuapp.com/']
 
 
 # Application definition
